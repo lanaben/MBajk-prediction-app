@@ -1,0 +1,23 @@
+{
+    "timestamp": "2024-03-13 18:53:39",
+    "station_name": "GOSPOSVETSKA_C._-_III._GIMNAZIJA",
+    "station_data": [
+        {
+            "number": 3,
+            "contract_name": "maribor",
+            "name": "GOSPOSVETSKA C. - III. GIMNAZIJA",
+            "address": "Gosposvetska cesta 4",
+            "position": {
+                "lat": 46.560761,
+                "lng": 15.64053
+            },
+            "banking": false,
+            "bonus": false,
+            "bike_stands": 20,
+            "available_bike_stands": 13,
+            "available_bikes": 7,
+            "status": "OPEN",
+            "last_update": 1710352368000
+        }
+    ]
+}

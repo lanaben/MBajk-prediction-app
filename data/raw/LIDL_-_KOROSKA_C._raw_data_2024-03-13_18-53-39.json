@@ -1,0 +1,23 @@
+{
+    "timestamp": "2024-03-13 18:53:39",
+    "station_name": "LIDL_-_KOROSKA_C.",
+    "station_data": [
+        {
+            "number": 18,
+            "contract_name": "maribor",
+            "name": "LIDL - KORO\u0160KA C.",
+            "address": "Koro\u0161ka cesta 173",
+            "position": {
+                "lat": 46.565603,
+                "lng": 15.623133
+            },
+            "banking": false,
+            "bonus": false,
+            "bike_stands": 20,
+            "available_bike_stands": 13,
+            "available_bikes": 7,
+            "status": "OPEN",
+            "last_update": 1710352361000
+        }
+    ]
+}
