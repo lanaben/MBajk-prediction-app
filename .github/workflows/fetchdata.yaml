@@ -2,7 +2,7 @@ name: Fetch Data Workflow
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "0 * * * *"
 
 permissions:
   contents: write
