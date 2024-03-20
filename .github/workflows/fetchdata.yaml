@@ -22,3 +22,11 @@ jobs:
 
     - name: Run fetch_data.py
       run: python src/data/fetch_data.py
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git commit -m "Auto-update data files"
+        git push
