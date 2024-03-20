@@ -22,4 +22,4 @@ jobs:
       run: pip install -r requirements.txt
 
     - name: Run fetch_data.py
-      run: python fetch_data.py
+      run: python src/data/fetch_data.py
