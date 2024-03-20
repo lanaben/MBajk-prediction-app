@@ -13,7 +13,7 @@ def normalize_station_name(station_name):
     return normalized_name.replace(" ", "_")
 
 def fetch_weather_data(latitude, longitude):
-    api_url = f'https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature'
+    api_url = f'https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,rain,visibility'
     response = requests.get(api_url)
     if response.status_code == 200:
         return response.json()
@@ -64,7 +64,7 @@ if response.status_code == 200:
 
         # Create CSV file for processed data
         processed_data_file = os.path.join(processed_data_dir, f"{normalized_station_name}_processed_data.csv")
-        header = ['datetime', 'bike_stands', 'available_bike_stands', 'temperature', 'relative_humidity', 'apparent_temperature']
+        header = ['datetime', 'bike_stands', 'available_bike_stands', 'temperature', 'relative_humidity', 'apparent_temperature', 'rain', 'visibility']
         with open(processed_data_file, 'a', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=header)
 
@@ -80,7 +80,9 @@ if response.status_code == 200:
                 'available_bike_stands': station['available_bike_stands'],
                 'temperature': weather_data['current']['temperature_2m'],
                 'relative_humidity': weather_data['current']['relative_humidity_2m'],
-                'apparent_temperature': weather_data['current']['apparent_temperature']
+                'apparent_temperature': weather_data['current']['apparent_temperature'],
+                'rain': weather_data['current']['rain'],
+                'visibility': weather_data['current']['visibility'],
             })
 
     print("Data saved successfully.")

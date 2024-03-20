@@ -30,5 +30,5 @@ jobs:
         git config user.name 'lanaben'
         git config user.email 'lanaben@users.noreply.github.com'
         git add .
-        git commit -m "Automated data fetch"
+        git commit -m "Automated data fetch."
         git push https://lanaben:${{ secrets.IIS_TOKEN }}@github.com/lanaben/ML-engineering.git main
