@@ -1,3 +1,4 @@
 datetime,bike_stands,available_bike_stands,temperature,relative_humidity,apparent_temperature,rain,visibility
 2024-03-20 18:42:37,20,6,9.4,69,7.0,0.0,24140.0
 2024-03-20 18:54:22,20,6,9.1,70,6.8,0.0,24140.0
+2024-03-20 19:15:01,20,6,8.5,72,6.4,0.0,24140.0
