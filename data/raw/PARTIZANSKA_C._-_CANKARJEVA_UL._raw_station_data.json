@@ -1,0 +1,19 @@
+[
+    {
+        "number": 11,
+        "contract_name": "maribor",
+        "name": "PARTIZANSKA C. - CANKARJEVA UL.",
+        "address": "Partizanska c. 13",
+        "position": {
+            "lat": 46.56056,
+            "lng": 15.652935
+        },
+        "banking": false,
+        "bonus": false,
+        "bike_stands": 20,
+        "available_bike_stands": 10,
+        "available_bikes": 10,
+        "status": "OPEN",
+        "last_update": 1710960730000
+    }
+]

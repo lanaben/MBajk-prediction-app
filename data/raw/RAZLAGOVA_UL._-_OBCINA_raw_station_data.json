@@ -1,0 +1,19 @@
+[
+    {
+        "number": 8,
+        "contract_name": "maribor",
+        "name": "RAZLAGOVA UL. - OB\u010cINA",
+        "address": "Razlagova ulica 1",
+        "position": {
+            "lat": 46.56196,
+            "lng": 15.650235
+        },
+        "banking": false,
+        "bonus": false,
+        "bike_stands": 20,
+        "available_bike_stands": 16,
+        "available_bikes": 4,
+        "status": "OPEN",
+        "last_update": 1710960694000
+    }
+]
