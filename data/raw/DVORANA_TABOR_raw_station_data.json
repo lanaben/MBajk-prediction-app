@@ -1,0 +1,19 @@
+[
+    {
+        "number": 22,
+        "contract_name": "maribor",
+        "name": "DVORANA TABOR",
+        "address": "Gorkega ulica 48",
+        "position": {
+            "lat": 46.549005,
+            "lng": 15.635014
+        },
+        "banking": false,
+        "bonus": false,
+        "bike_stands": 20,
+        "available_bike_stands": 14,
+        "available_bikes": 6,
+        "status": "OPEN",
+        "last_update": 1710957330000
+    }
+]
