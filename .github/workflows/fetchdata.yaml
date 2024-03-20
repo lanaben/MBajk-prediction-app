@@ -11,10 +11,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: '3.x'
 
@@ -23,3 +23,10 @@ jobs:
 
     - name: Run fetch_data.py
       run: python src/data/fetch_data.py
+
+    - name: Commit changes
+      run: |
+        git config --global user.name 'lanaben'
+        git config --global user.email 'lanaben@users.noreply.github.com'
+        git commit -am "Automated report"
+        git push
