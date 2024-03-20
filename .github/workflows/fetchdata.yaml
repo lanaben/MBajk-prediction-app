@@ -2,7 +2,7 @@ name: Fetch Data Workflow
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/2 * * * *"
 
 jobs:
   fetch:
@@ -11,6 +11,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      with: { ref: debug }
 
     - name: Set up Python
       uses: actions/setup-python@v2
