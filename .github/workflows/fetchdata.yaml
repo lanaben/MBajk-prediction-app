@@ -1,8 +1,9 @@
 name: Fetch Data Workflow
 
 on:
-  schedule:
-    - cron: '0 * * * *'
+  push:
+    branches:
+      - main
 
 jobs:
   test:
