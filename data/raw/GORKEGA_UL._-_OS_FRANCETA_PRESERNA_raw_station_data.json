@@ -1,0 +1,19 @@
+[
+    {
+        "number": 21,
+        "contract_name": "maribor",
+        "name": "GORKEGA UL. - O\u0160 FRANCETA PRE\u0160ERNA",
+        "address": "Gorkega ulica 32",
+        "position": {
+            "lat": 46.550683,
+            "lng": 15.639333
+        },
+        "banking": false,
+        "bonus": false,
+        "bike_stands": 20,
+        "available_bike_stands": 9,
+        "available_bikes": 11,
+        "status": "OPEN",
+        "last_update": 1710959644000
+    }
+]
