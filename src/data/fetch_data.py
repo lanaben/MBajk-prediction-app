@@ -42,14 +42,11 @@ if response.status_code == 200:
         with open(raw_station_data_file, 'w') as f:
             json.dump(station_data, f, indent=4)
 
-        # Get station coordinates
         latitude = station['position']['lat']
         longitude = station['position']['lng']
 
-        # Fetch weather data for the station
         weather_data = fetch_weather_data(latitude, longitude)
         if weather_data:
-            # Save raw weather data
             raw_weather_data_file = os.path.join(weather_data_dir, f"{normalized_station_name}_raw_weather_data.json")
             with open(raw_weather_data_file, 'w') as f:
                 json.dump(weather_data, f, indent=4)
@@ -62,17 +59,14 @@ if response.status_code == 200:
             "station_data": station_data
         }
 
-        # Create CSV file for processed data
         processed_data_file = os.path.join(processed_data_dir, f"{normalized_station_name}_processed_data.csv")
         header = ['datetime', 'bike_stands', 'available_bike_stands', 'temperature', 'relative_humidity', 'apparent_temperature', 'rain', 'visibility']
         with open(processed_data_file, 'a', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=header)
 
-            # If the file is empty, write the header
             if os.stat(processed_data_file).st_size == 0:
                 writer.writeheader()
 
-            # Write the current record
             record_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             writer.writerow({
                 'datetime': record_time,

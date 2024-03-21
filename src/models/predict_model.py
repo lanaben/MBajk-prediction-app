@@ -1,115 +1,120 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import glob
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, explained_variance_score
 from keras.models import Sequential
 from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import GRU, Dense
 from tensorflow.keras.optimizers import Adam
-from joblib import dump
 import os
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(ROOT_DIR, '..', '..', 'data', 'raw', 'mbajk_dataset.csv')
+DATA_DIR = os.path.join(ROOT_DIR, '..', '..', 'data', 'processed')
 
-df = pd.read_csv(DATA_DIR)
+data_files = glob.glob(os.path.join(DATA_DIR, '*.csv'))
 
-df['date'] = pd.to_datetime(df['date'])
-df = df.sort_values(by='date')
+for file_path in data_files:
+    df = pd.read_csv(file_path)
 
-time_series = df['available_bike_stands'].values.reshape(-1, 1)
+    avg_values = df.drop(columns=['datetime']).mean()
+    df.fillna(avg_values, inplace=True)
 
-scaler = MinMaxScaler()
-time_series_normalized = scaler.fit_transform(time_series)
+    df['Total_Rain_Last_3_Days'] = df['rain'].rolling(window=3).sum()
+    df['comfort_index'] = df['temperature'] - 0.55 * (1 - df['relative_humidity']/100) * (df['temperature'] - 14.5)
 
-train_size = len(time_series) - 1302
-train_data, test_data = time_series_normalized[0:train_size], time_series_normalized[train_size:]
+    df['datetime'] = pd.to_datetime(df['datetime'])
 
-def create_window_data(data, window_size):
-    X, y = [], []
-    for i in range(len(data) - window_size):
-        X.append(data[i:i + window_size])
-        y.append(data[i + window_size])
-    return np.array(X), np.array(y)
+    df['hour'] = df['datetime'].dt.hour
+    df['day_of_week'] = df['datetime'].dt.dayofweek
+    df['month'] = df['datetime'].dt.month
+    df['is_weekend'] = df['day_of_week'].isin([5, 6]).astype(int)
 
-window_size = 186
-X_train, y_train = create_window_data(train_data, window_size)
-X_test, y_test = create_window_data(test_data, window_size)
+    avg_values = df.drop(columns=['datetime']).mean()
+    df.fillna(avg_values, inplace=True)
 
-X_train = X_train.reshape(-1, 1, window_size)
-X_test = X_test.reshape(-1, 1, window_size)
+    df = df.drop(columns=['datetime'])
 
-learning_rate = 0.001
-optimizer = Adam(learning_rate=learning_rate)
+    scaler = MinMaxScaler()
+    df = pd.DataFrame(scaler.fit_transform(df), columns=df.columns, index=df.index)
 
-model = Sequential([
-    GRU(8, activation='relu', input_shape=(1, window_size), return_sequences=True),
-    BatchNormalization(),
-    Dense(8, activation='relu'),
-    BatchNormalization(),
-    Dense(1)
-])
+    correlation_matrix = df.corr()
+    abs_correlation_with_available_bike_stands = correlation_matrix['available_bike_stands'].abs()
+    sorted_correlations = abs_correlation_with_available_bike_stands.sort_values(ascending=False)
+    numeric_columns = sorted_correlations[0:5].index.tolist()
 
-model.compile(optimizer, loss='mean_squared_error')
+    multivariate_features = df[numeric_columns]
+    num_features = 5
 
-history = model.fit(X_train, y_train, epochs=30, batch_size=32, validation_data=(X_test, y_test), verbose=1)
+    numpy_array = multivariate_features.to_numpy()
 
-plt.plot(history.history['loss'], label='Training Loss')
-plt.plot(history.history['val_loss'], label='Validation Loss')
-plt.title('Model Training History')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.legend()
-plt.show()
+    split_index = int(0.6 * len(numpy_array))
 
-loss = model.evaluate(X_test, y_test, verbose=0)
+    train_data = numpy_array[:split_index]
+    test_data = numpy_array[split_index:]
 
-predictions = model.predict(X_test)
+    window_size = 5
 
-y_test_reshaped = y_test.reshape(-1)
-predictions_reshaped = predictions.reshape(-1)
+    def prepare_sequences(data, window, future_steps=7):
+        windows = []
+        labels = []
+        for i in range(window, len(data) - future_steps + 1):
+            x = data[i - window:i, :]
+            y = data[i:i + future_steps, 0]
+            windows.append(x)
+            labels.append(y)
+        return np.array(windows), np.array(labels)
 
-predictions_inverse = scaler.inverse_transform(predictions.reshape(-1, 1))
-y_test_inverse = scaler.inverse_transform(y_test.reshape(-1, 1))
+    X_train, y_train = prepare_sequences(train_data, window_size)
+    X_test, y_test = prepare_sequences(test_data, window_size)
 
-mae = mean_absolute_error(y_test_inverse, predictions_inverse)
-mse = mean_squared_error(y_test_inverse, predictions_inverse)
-r2 = r2_score(y_test_inverse, predictions_inverse)
+    X_train = np.reshape(X_train, (X_train.shape[0], window_size, num_features))
+    X_test = np.reshape(X_test, (X_test.shape[0], window_size, num_features))
 
-print(f'MAE: {mae}')
-print(f'MSE: {mse}')
-print(f'R^2: {r2}')
+    learning_rate = 0.001
+    optimizer = Adam(learning_rate=learning_rate)
 
-model.save('bike_stands_model3.h5')
+    model_gru = Sequential([
+        GRU(8, activation='relu', input_shape=(window_size, num_features)),
+        BatchNormalization(),
+        Dense(8, activation='relu'),
+        BatchNormalization(),
+        Dense(7)
+    ])
 
-dump(scaler, '../../models/bike_stands_scaler.joblib')
+    model_gru.compile(optimizer=optimizer, loss='mean_squared_error')
 
-import os
+    epochs = 30
+    batch_size = 16
+    verbose = 1
+    history = model_gru.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_test, y_test), verbose=verbose)
 
-if not os.path.exists('reports'):
-    os.makedirs('reports')
+    predictions = model_gru.predict(X_test)
+    mae = mean_absolute_error(y_test, predictions)
+    mse = mean_squared_error(y_test, predictions)
+    evs = explained_variance_score(y_test, predictions)
+    r2 = r2_score(y_test, predictions)
 
-with open("../../reports/test_metrics.txt", "w") as test_file:
-    test_file.write(f"MAE: {mae}\n")
-    test_file.write(f"MSE: {mse}\n")
-    test_file.write(f"R^2: {r2}\n")
+    train_predictions = model_gru.predict(X_train)
+    train_mae = mean_absolute_error(y_train, train_predictions)
+    train_mse = mean_squared_error(y_train, train_predictions)
+    train_evs = explained_variance_score(y_train, train_predictions)
+    train_r2 = r2_score(y_train, train_predictions)
 
-loss = model.evaluate(X_train, y_train, verbose=0)
+    train_metrics_text = f"Mean Absolute Error (MAE): {train_mae}\nMean Squared Error (MSE): {train_mse}\nExplained Variance Score (EVS): {train_evs}\nR2 Score (R2): {train_r2}"
+    test_metrics_text = f"Mean Absolute Error (MAE): {mae}\nMean Squared Error (MSE): {mse}\nExplained Variance Score (EVS): {evs}\nR2 Score (R2): {r2}"
 
-predictions = model.predict(X_train)
+    model_name = os.path.basename(file_path).replace('.csv', '')
+    model_path = os.path.join(ROOT_DIR, '..', '..', 'models', model_name + '_model.h5')
+    train_metrics_path = os.path.join(ROOT_DIR, '..', '..', 'reports', model_name, 'train_metrics.txt')
+    test_metrics_path = os.path.join(ROOT_DIR, '..', '..', 'reports', model_name, 'test_metrics.txt')
 
-y_train_reshaped = y_train.reshape(-1)
-predictions_reshaped = predictions.reshape(-1)
+    os.makedirs(os.path.dirname(train_metrics_path), exist_ok=True)
 
-predictions_inverse = scaler.inverse_transform(predictions.reshape(-1, 1))
-y_train_inverse = scaler.inverse_transform(y_train.reshape(-1, 1))
+    model_gru.save(model_path)
 
-train_mae = mean_absolute_error(y_train_inverse, predictions_inverse)
-train_mse = mean_squared_error(y_train_inverse, predictions_inverse)
-train_r2 = r2_score(y_train_inverse, predictions_inverse)
+    with open(train_metrics_path, "w") as file:
+        file.write(train_metrics_text)
 
-with open("../../reports/train_metrics.txt", "w") as train_file:
-    train_file.write(f"MAE: {train_mae}\n")
-    train_file.write(f"MSE: {train_mse}\n")
-    train_file.write(f"R^2: {train_r2}\n")
+    with open(test_metrics_path, "w") as file:
+        file.write(test_metrics_text)
