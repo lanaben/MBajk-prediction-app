@@ -16,11 +16,11 @@
         "visibility": "m"
     },
     "current": {
-        "time": "2024-03-22T09:15",
+        "time": "2024-03-22T09:30",
         "interval": 900,
-        "temperature_2m": 15.9,
-        "relative_humidity_2m": 45,
-        "apparent_temperature": 14.0,
+        "temperature_2m": 16.2,
+        "relative_humidity_2m": 44,
+        "apparent_temperature": 14.5,
         "rain": 0.0,
         "visibility": 24140.0
     }
