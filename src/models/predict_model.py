@@ -37,18 +37,21 @@ for file_path in data_files:
 
     df = df.drop(columns=['datetime'])
 
-    scaler = MinMaxScaler()
-    df = pd.DataFrame(scaler.fit_transform(df), columns=df.columns, index=df.index)
-
     # correlation_matrix = df.corr()
     # abs_correlation_with_available_bike_stands = correlation_matrix['available_bike_stands'].abs()
     # sorted_correlations = abs_correlation_with_available_bike_stands.sort_values(ascending=False)
     # numeric_columns = sorted_correlations[0:5].index.tolist()
 
-    multivariate_features = df[['available_bike_stands', 'temperature', 'relative_humidity', 'apparent_temperature', 'rain']]
+    multivariate_features = df[
+        ['available_bike_stands', 'temperature', 'relative_humidity', 'apparent_temperature', 'rain']]
+
+    scaler = MinMaxScaler()
+    df_scaled = pd.DataFrame(scaler.fit_transform(multivariate_features), columns=multivariate_features.columns,
+                             index=multivariate_features.index)
+
     num_features = 5
 
-    numpy_array = multivariate_features.to_numpy()
+    numpy_array = df_scaled.to_numpy()
 
     split_index = int(0.6 * len(numpy_array))
 

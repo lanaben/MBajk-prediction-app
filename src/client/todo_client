@@ -1,4 +1,0 @@
-#TODO: vue/react client
-- najprej pridobi seznam vseh postaj, jih izpiše (GET vse postaje)
-- klikneš na postajo, izpiše trenutno stanje (GET trenutno stanje)
-- klikneš na nek gumb predict, izpišejo se predictioni (GET prediction/postaja)
