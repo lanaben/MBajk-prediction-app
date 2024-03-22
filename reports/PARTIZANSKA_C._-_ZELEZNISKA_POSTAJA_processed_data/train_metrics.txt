@@ -1,4 +1,4 @@
-Mean Absolute Error (MAE): 0.08691538405882847
-Mean Squared Error (MSE): 0.012652485248363763
-Explained Variance Score (EVS): -0.2973992263043481
-R2 Score (R2): -4.573093289668867
+Mean Absolute Error (MAE): 0.252158205655693
+Mean Squared Error (MSE): 0.0983925954807715
+Explained Variance Score (EVS): 0.06389518927078693
+R2 Score (R2): -1.139852226505343

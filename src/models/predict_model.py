@@ -1,3 +1,4 @@
+import joblib
 import pandas as pd
 import numpy as np
 import glob
@@ -15,6 +16,7 @@ DATA_DIR = os.path.join(ROOT_DIR, '..', '..', 'data', 'processed')
 data_files = glob.glob(os.path.join(DATA_DIR, '*.csv'))
 
 for file_path in data_files:
+    print(file_path)
     df = pd.read_csv(file_path)
 
     avg_values = df.drop(columns=['datetime']).mean()
@@ -38,12 +40,12 @@ for file_path in data_files:
     scaler = MinMaxScaler()
     df = pd.DataFrame(scaler.fit_transform(df), columns=df.columns, index=df.index)
 
-    correlation_matrix = df.corr()
-    abs_correlation_with_available_bike_stands = correlation_matrix['available_bike_stands'].abs()
-    sorted_correlations = abs_correlation_with_available_bike_stands.sort_values(ascending=False)
-    numeric_columns = sorted_correlations[0:5].index.tolist()
+    # correlation_matrix = df.corr()
+    # abs_correlation_with_available_bike_stands = correlation_matrix['available_bike_stands'].abs()
+    # sorted_correlations = abs_correlation_with_available_bike_stands.sort_values(ascending=False)
+    # numeric_columns = sorted_correlations[0:5].index.tolist()
 
-    multivariate_features = df[numeric_columns]
+    multivariate_features = df[['available_bike_stands', 'temperature', 'relative_humidity', 'apparent_temperature', 'rain']]
     num_features = 5
 
     numpy_array = multivariate_features.to_numpy()
@@ -70,6 +72,11 @@ for file_path in data_files:
 
     X_train = np.reshape(X_train, (X_train.shape[0], window_size, num_features))
     X_test = np.reshape(X_test, (X_test.shape[0], window_size, num_features))
+
+    print("Oblika X_train:", X_train.shape)
+    print("Oblika y_train:", y_train.shape)
+    print("Oblika X_test:", X_test.shape)
+    print("Oblika y_test:", y_test.shape)
 
     learning_rate = 0.001
     optimizer = Adam(learning_rate=learning_rate)
@@ -112,6 +119,12 @@ for file_path in data_files:
     os.makedirs(os.path.dirname(train_metrics_path), exist_ok=True)
 
     model_gru.save(model_path)
+
+    scaler_dir = os.path.join(ROOT_DIR, '..', '..', 'models', 'scalers')
+    os.makedirs(scaler_dir, exist_ok=True)
+
+    scaler_path = os.path.join(scaler_dir, model_name + '_scaler.pkl')
+    joblib.dump(scaler, scaler_path)
 
     with open(train_metrics_path, "w") as file:
         file.write(train_metrics_text)
