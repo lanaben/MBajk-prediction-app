@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  backend-bikes:
+    build: .
+    restart: always
+    container_name: "backend-bikes"
+    ports:
+      - 5000:5000
+
+  frontend-bikes:
+    build: ./src/client
+    restart: always
+    container_name: "frontend-bikes"
+    ports:
+      - 8080:8080
+    depends_on:
+      - backend-bikes

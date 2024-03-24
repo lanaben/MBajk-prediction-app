@@ -1,7 +1,6 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <h1>Welcome to Your Vue.js App</h1>
+    <h1>Stations</h1>
     <ul>
       <li v-for="station in stations" :key="station" @click="selectStation(station)">
         {{ station }}

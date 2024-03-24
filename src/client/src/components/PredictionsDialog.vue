@@ -1,48 +1,59 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <h1>Welcome to Your Vue.js App</h1>
-    <ul>
-      <li v-for="station in stations" :key="station" @click="selectStation(station)">
-        {{ station }}
+  <div class="dialog">
+    <h2>Predictions for {{ station }}</h2>
+    <ul v-if="predictions.length">
+      <li v-for="(prediction, index) in predictions" :key="`prediction-${index}`">
+        Prediction {{ index + 1 }}: {{ Math.round(prediction) }}
       </li>
     </ul>
-    <PredictionsDialog v-if="selectedStation" :station="selectedStation" @close="selectedStation = null"/>
+    <button @click="$emit('close')">Close</button>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
 import axios from "axios";
-import PredictionsDialog from './components/PredictionsDialog.vue';
 
 const apiUrl = "http://localhost:5000/mbajk";
-const stations = ref<string[]>([]);
-const selectedStation = ref<string | null>(null);
 
-const fetchStations = async () => {
-  try {
-    const response = await axios.get(`${apiUrl}/stations`);
-    stations.value = response.data.Stations.map((station: any) => station.name);
-  } catch (error) {
-    console.error("There was an error fetching the stations:", error);
+import { ref, watch, defineProps } from 'vue';
+
+const props = defineProps({
+  station: String
+});
+
+const stationData = ref<number[]>([]);
+const predictions = ref<number[]>([]);
+
+watch(() => props.station, async (newStation) => {
+  if (newStation) {
+    stationData.value = await fetchStationData(newStation,7);
+    if (stationData.value && stationData.value.length > 0) {
+      predictions.value = await predictStationData(newStation, stationData.value);
+    }
   }
-};
+}, { immediate: true });
 
-const selectStation = (stationName: string) => {
-  selectedStation.value = stationName;
-};
+async function fetchStationData(stationName: string, limit: number) {
+  try {
+    const response = await axios.get(`${apiUrl}/${encodeURIComponent(stationName)}/${limit}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("There was an error fetching the station data:", error);
+  }
+}
 
-onMounted(fetchStations);
+async function predictStationData(stationName: string, data: number[]) {
+  try {
+    const response = await axios.post(`${apiUrl}/predict/${encodeURIComponent(stationName)}`, {
+      data: data
+    });
+    return response.data.prediction;
+  } catch (error) {
+    console.error("There was an error making a prediction:", error);
+  }
+}
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style scoped>
+
 </style>
