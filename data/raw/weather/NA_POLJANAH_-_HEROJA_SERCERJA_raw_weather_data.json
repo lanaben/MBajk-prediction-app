@@ -1,7 +1,7 @@
 {
     "latitude": 46.56,
     "longitude": 15.619999,
-    "generationtime_ms": 0.13399124145507812,
+    "generationtime_ms": 0.09500980377197266,
     "utc_offset_seconds": 0,
     "timezone": "GMT",
     "timezone_abbreviation": "GMT",
@@ -16,11 +16,11 @@
         "visibility": "m"
     },
     "current": {
-        "time": "2024-03-29T20:30",
+        "time": "2024-03-29T21:15",
         "interval": 900,
-        "temperature_2m": 16.6,
-        "relative_humidity_2m": 53,
-        "apparent_temperature": 13.5,
+        "temperature_2m": 16.0,
+        "relative_humidity_2m": 55,
+        "apparent_temperature": 13.9,
         "rain": 0.0,
         "visibility": 24140.0
     }
