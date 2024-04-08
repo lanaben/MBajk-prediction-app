@@ -11,9 +11,9 @@
         "banking": false,
         "bonus": false,
         "bike_stands": 22,
-        "available_bike_stands": 2,
-        "available_bikes": 20,
+        "available_bike_stands": 3,
+        "available_bikes": 19,
         "status": "OPEN",
-        "last_update": 1712549527000
+        "last_update": 1712550804000
     }
 ]
