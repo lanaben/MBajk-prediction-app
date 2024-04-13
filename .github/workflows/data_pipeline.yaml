@@ -1,0 +1,87 @@
+name: Data Pipeline
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+
+jobs:
+  fetch_bike_data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Test data source
+        run: python src/tests/test_data_source.py
+
+      - name: Fetch bike data
+        run: python src/data/fetch_bike_data.py
+
+      - name: Add bike data to DVC
+        run: dvc add data/raw/bike_data.json
+
+  preprocess_bike_data:
+    runs-on: ubuntu-latest
+    needs: fetch_bike_data
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Preprocess bike data
+        run: python src/data/process_bike_data.py
+
+      - name: Add preprocessed bike data to DVC
+        run: dvc add data/processed_bike_data.json
+
+  fetch_weather_data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch weather data
+        run: python src/data/fetch_weather_data.py
+
+      - name: Add weather data to DVC
+        run: dvc add data/raw/weather_data.json
+
+  preprocess_weather_data:
+    runs-on: ubuntu-latest
+    needs: fetch_weather_data
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Preprocess weather data
+        run: python src/data/process_weather_data.py
+
+      - name: Add preprocessed weather data to DVC
+        run: dvc add data/processed_weather_data.json
+
+  merge_data:
+    runs-on: ubuntu-latest
+    needs: [preprocess_bike_data, preprocess_weather_data]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Merge data
+        run: python src/data/merge_data.py
+
+      - name: Add merged data to DVC
+        run: dvc add data/merged_data.json
