@@ -85,6 +85,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Install DVC
+        run: |
+          pip install dvc
+          dvc --version
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install dvc
+
       - name: Fetch weather data
         run: python src/data/fetch_weather_data.py
       - name: Cache weather data
