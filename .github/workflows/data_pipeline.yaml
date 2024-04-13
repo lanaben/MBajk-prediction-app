@@ -39,6 +39,9 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Install DVC
         run: |
           pip install dvc
@@ -48,8 +51,7 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install dvc
-      - name: Checkout repository
-        uses: actions/checkout@v2
+
       - name: Fetch bike data
         run: python src/data/fetch_bike_data.py
       - name: Cache bike data
