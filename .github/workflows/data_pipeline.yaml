@@ -30,7 +30,7 @@ jobs:
       - name: Fetch bike data
         run: python src/data/fetch_bike_data.py
       - name: Cache bike data
-        run: dvc add data/raw/bike_data.json
+        run: dvc add data/raw
 
   preprocess_bike_data:
     needs: fetch_bike_data
@@ -41,7 +41,7 @@ jobs:
       - name: Preprocess bike data
         run: python src/data/process_bike_data.py
       - name: Cache preprocessed bike data
-        run: dvc add data/processed/bike_data.json
+        run: dvc add data/processed/processed_bike_data
 
   fetch_weather_data:
     needs: setup
@@ -52,7 +52,7 @@ jobs:
       - name: Fetch weather data
         run: python src/data/fetch_weather_data.py
       - name: Cache weather data
-        run: dvc add data/raw/weather_data.json
+        run: dvc add data/raw/weather
 
   preprocess_weather_data:
     needs: fetch_weather_data
@@ -63,7 +63,7 @@ jobs:
       - name: Preprocess weather data
         run: python src/data/process_weather_data.py
       - name: Cache preprocessed weather data
-        run: dvc add data/processed/weather_data.json
+        run: dvc add data/processed/processed_weather_data
 
   merge_data:
     needs: [preprocess_bike_data, preprocess_weather_data]
@@ -74,7 +74,7 @@ jobs:
       - name: Merge data
         run: python src/data/merge_data.py
       - name: Cache merged data
-        run: dvc add data/merged_data.json
+        run: dvc add data/processed
 
   commit_and_push:
     needs: merge_data
