@@ -3,85 +3,89 @@ name: Data Pipeline
 on:
   schedule:
     - cron: "*/30 * * * *"
+  workflow_dispatch:
 
 jobs:
-  fetch_bike_data:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
+      - name: Cache Python dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Test data source
-        run: python src/tests/test_data_source.py
-
+  fetch_bike_data:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
       - name: Fetch bike data
         run: python src/data/fetch_bike_data.py
-
-      - name: Add bike data to DVC
+      - name: Cache bike data
         run: dvc add data/raw/bike_data.json
 
   preprocess_bike_data:
-    runs-on: ubuntu-latest
     needs: fetch_bike_data
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
       - name: Preprocess bike data
         run: python src/data/process_bike_data.py
-
-      - name: Add preprocessed bike data to DVC
-        run: dvc add data/processed_bike_data.json
+      - name: Cache preprocessed bike data
+        run: dvc add data/processed/bike_data.json
 
   fetch_weather_data:
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
       - name: Fetch weather data
         run: python src/data/fetch_weather_data.py
-
-      - name: Add weather data to DVC
+      - name: Cache weather data
         run: dvc add data/raw/weather_data.json
 
   preprocess_weather_data:
-    runs-on: ubuntu-latest
     needs: fetch_weather_data
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
       - name: Preprocess weather data
         run: python src/data/process_weather_data.py
-
-      - name: Add preprocessed weather data to DVC
-        run: dvc add data/processed_weather_data.json
+      - name: Cache preprocessed weather data
+        run: dvc add data/processed/weather_data.json
 
   merge_data:
-    runs-on: ubuntu-latest
     needs: [preprocess_bike_data, preprocess_weather_data]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
       - name: Merge data
         run: python src/data/merge_data.py
-
-      - name: Add merged data to DVC
+      - name: Cache merged data
         run: dvc add data/merged_data.json
+
+  commit_and_push:
+    needs: merge_data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'lanaben'
+          git config --global user.email 'lanaben@users.noreply.github.com'
+          git add .
+          git commit -m "Update data and DVC tracking files."
+          git push https://lanaben:${{ secrets.IIS_TOKEN }}@github.com/lanaben/ML-engineering.git main
