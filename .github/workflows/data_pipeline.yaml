@@ -12,11 +12,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Add a step to print current user and permissions
-      - name: Check permissions
+      - name: List directory structure
         run: |
-          whoami
-          ls -l data/raw
+          pwd
+          ls -R
 
   setup:
     runs-on: ubuntu-latest
