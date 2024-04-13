@@ -6,6 +6,18 @@ on:
   workflow_dispatch:
 
 jobs:
+  check_permissions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Add a step to print current user and permissions
+      - name: Check permissions
+        run: |
+          whoami
+          ls -l data/raw
+
   setup:
     runs-on: ubuntu-latest
     steps:
