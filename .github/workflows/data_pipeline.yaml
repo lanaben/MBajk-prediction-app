@@ -104,13 +104,13 @@ jobs:
           dvc remote modify origin --local access_key_id 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55
           dvc remote modify origin --local secret_access_key 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55
 
-      - name: Backup existing processed data
+      - name: Backup conflicting data
         run: |
           mkdir -p backup
-          cp data/processed/*.csv backup/
+          cp data/raw/weather/*.json backup/
 
       - name: Pull data with DVC
-        run: dvc pull data/raw/weather
+        run: dvc pull data/raw/weather --force
 
       - name: Run Python script to generate/update data
         run: python src/data/fetch_weather_data.py
