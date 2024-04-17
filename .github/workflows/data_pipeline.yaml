@@ -119,7 +119,10 @@ jobs:
           dvc push
           git add data.dvc
           git commit -m "Update weather data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/ML-engineering.git main
+        env:
+          IIS: ${{ secrets.IIS }}
+
 
 
   preprocess_weather_data:
