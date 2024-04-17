@@ -116,9 +116,9 @@ jobs:
           git config user.email 'lanaben@users.noreply.github.com'
           dvc add data/raw/weather
           dvc status
-          git add data.dvc
-          git commit -m "Update weather data."
           dvc push
+          git add data/raw/weather.dvc .gitignore
+          git commit -m "Update weather data."
           git push https://lanaben:${{ secrets.IIS_TOKEN }}@github.com/lanaben/ML-engineering.git main
 
 
