@@ -1,12 +1,11 @@
 name: Data Pipeline
 
 on:
-  schedule:
-    - cron: "*/30 * * * *"
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-
   setup:
     runs-on: ubuntu-latest
     steps:
@@ -37,6 +36,7 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install dvc
+
 
   fetch_weather_data:
     needs: setup
