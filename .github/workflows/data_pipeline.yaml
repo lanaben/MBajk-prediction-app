@@ -112,8 +112,8 @@ jobs:
 
       - name: Add and commit data to DVC
         run: |
-          git config user.name 'lanaben'
-          git config user.email 'lanaben@gmail.com'
+          git config --global user.name 'lanaben'
+          git config --global user.email 'lanaben@users.noreply.github.com'
           dvc add data
           dvc status
           dvc push
