@@ -61,9 +61,6 @@ jobs:
           dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
           dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
 
-      - name: Pull data with DVC
-        run: dvc pull data/raw/weather --force
-
       - name: Add and commit data to DVC
         run: |
           git config --global user.name 'lanaben'
