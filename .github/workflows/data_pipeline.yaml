@@ -6,16 +6,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  check_permissions:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: List directory structure
-        run: |
-          pwd
-          ls -R
 
   setup:
     runs-on: ubuntu-latest
@@ -45,43 +35,6 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install dvc
-
-  fetch_bike_data:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install DVC
-        run: |
-          pip install dvc
-          dvc --version
-
-      - name: Add DagsHub as remote origin
-        run: dvc remote add https://dagshub.com/lanaben/MBajk-prediction-app
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install dvc
-
-      - name: Fetch bike data
-        run: python src/data/fetch_bike_data.py
-
-      - name: Cache bike data
-        run: dvc add data/raw
-
-  preprocess_bike_data:
-    needs: fetch_bike_data
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Preprocess bike data
-        run: python src/data/process_bike_data.py
-      - name: Cache preprocessed bike data
-        run: dvc add data/processed/processed_bike_data
 
   fetch_weather_data:
     needs: setup
