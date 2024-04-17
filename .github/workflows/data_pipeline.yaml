@@ -71,7 +71,7 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           dvc add data
           dvc status
-          dvc push
+          dvc push -r origin
           git add data.dvc
           git commit -m "Update weather data."
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
