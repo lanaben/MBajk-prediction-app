@@ -62,13 +62,11 @@ jobs:
       - name: Pull data with DVC
         run: dvc pull data/raw/weather --force
 
-      - name: Run Python script to generate/update data
-        run: python src/data/fetch_weather_data.py
-
       - name: Add and commit data to DVC
         run: |
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
+          python src/data/fetch_weather_data.py
           dvc add data
           dvc status
           dvc push -r origin
