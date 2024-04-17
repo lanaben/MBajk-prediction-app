@@ -1,0 +1,17 @@
+{
+    "number": 19,
+    "contract_name": "maribor",
+    "name": "LIDL - TITOVA C.",
+    "address": "Titova cesta 15",
+    "position": {
+        "lat": 46.551963,
+        "lng": 15.651564
+    },
+    "banking": false,
+    "bonus": false,
+    "bike_stands": 20,
+    "available_bike_stands": 13,
+    "available_bikes": 7,
+    "status": "OPEN",
+    "last_update": 1713009359000
+}
