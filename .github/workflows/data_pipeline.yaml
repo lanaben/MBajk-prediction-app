@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -56,8 +58,8 @@ jobs:
         run: |
           dvc remote add -f origin s3://dvc
           dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
-          dvc remote modify origin --local access_key_id 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55 
-          dvc remote modify origin --local secret_access_key 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55 
+          dvc remote modify origin --local access_key_id ${{ secrets.ACCESS_KEY_ID }}
+          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
 
       - name: Pull data with DVC
         run: dvc pull data/raw/weather --force
