@@ -115,9 +115,8 @@ jobs:
       - name: Fetch weather data
         run: python src/data/fetch_weather_data.py
 
-      - name: DVC track and push new weather data
+      - name: DVC push new weather data
         run: |
-          dvc add data/raw/weather
           dvc push data/raw/weather
 
 
