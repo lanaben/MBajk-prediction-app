@@ -98,21 +98,28 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install dvc
 
       - name: Configure DVC
         run: |
           dvc remote modify origin --local access_key_id 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55
           dvc remote modify origin --local secret_access_key 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55
 
-      - name: DVC pull
-        run: dvc pull -r origin
+      - name: Backup existing processed data
+        run: |
+          mkdir -p backup
+          cp data/processed/*.csv backup/
+
+      - name: DVC pull (force overwrite)
+        run: dvc pull -r origin --force
 
       - name: Fetch weather data
         run: python src/data/fetch_weather_data.py
 
-      - name: Push weather data
-        run: dvc push data/raw/weather
+      - name: DVC track and push new weather data
+        run: |
+          dvc add data/raw/weather
+          dvc push data/raw/weather
+
 
   preprocess_weather_data:
     needs: fetch_weather_data
