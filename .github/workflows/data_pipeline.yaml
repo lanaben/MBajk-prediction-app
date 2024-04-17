@@ -113,9 +113,14 @@ jobs:
       - name: Add and commit data to DVC
         run: |
           dvc add data/raw/weather
-          dvc push
-          git add data/raw/weather.dvc data/.gitignore
-          git commit -m "Update weather data"
+          dvc status
+          if [ -f data/raw/weather.dvc ]; then
+            git add data/raw/weather.dvc .gitignore
+            git commit -m "Update weather data"
+            dvc push
+            git push
+          else
+            echo "No .dvc file created; possibly no changes detected or files unchanged."
 
 
   preprocess_weather_data:
