@@ -61,6 +61,9 @@ jobs:
           dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
           dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
 
+      - name: Pull data with DVC
+        run: dvc pull --force
+
       - name: Add and commit data to DVC
         run: |
           git config --global user.name 'lanaben'
@@ -68,6 +71,7 @@ jobs:
           python src/data/fetch_weather_data.py
           dvc add data
           git add data.dvc
+          dvc status
           dvc push
           git commit -m "Update weather data."
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
