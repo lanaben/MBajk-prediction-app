@@ -66,10 +66,9 @@ jobs:
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
           python src/data/fetch_weather_data.py
-          dvc add data/raw/weather
+          dvc add data
           git add data.dvc
-          dvc status
-          dvc push -r origin
+          dvc push
           git commit -m "Update weather data."
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
         env:
