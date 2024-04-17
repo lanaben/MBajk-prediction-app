@@ -54,7 +54,7 @@ jobs:
 
       - name: Configure DVC
         run: |
-          dvc remote add origin s3://dvc
+          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
           dvc remote modify origin --local access_key_id 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55
           dvc remote modify origin --local secret_access_key 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55
 
