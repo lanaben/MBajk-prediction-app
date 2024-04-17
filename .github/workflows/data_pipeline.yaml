@@ -58,9 +58,6 @@ jobs:
           pip install dvc
           dvc --version
 
-      - name: Initialize DVC
-        run: dvc init
-
       - name: Add DagsHub as remote origin
         run: dvc remote add https://dagshub.com/lanaben/MBajk-prediction-app
 
