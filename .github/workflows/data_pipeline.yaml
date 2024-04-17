@@ -6,13 +6,12 @@ on:
   workflow_dispatch:
 
 jobs:
+
   setup:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Ensures full Git history is checked out
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -27,11 +26,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
+      - name: Install DVC
+        run: |
+          pip install dvc
+          dvc --version
+
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install dvc
+
+  fetch_weather_data:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Configure DVC
         run: |
@@ -40,41 +50,25 @@ jobs:
           dvc remote modify origin --local access_key_id 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55 
           dvc remote modify origin --local secret_access_key 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55 
 
-  process_data:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python and install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip
-          pip install -r requirements.txt
-          pip install dvc
-
       - name: Pull data with DVC
-        run: dvc pull -r origin --force
+        run: dvc pull data/raw/weather --force
 
       - name: Run Python script to generate/update data
         run: python src/data/fetch_weather_data.py
 
       - name: Add and commit data to DVC
         run: |
-          dvc add data
-          dvc push -r origin
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
+          dvc add data
+          dvc status
+          dvc push -r origin
           git add data.dvc
           git commit -m "Update weather data."
-          git push
+          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+        env:
+          IIS: ${{ secrets.IIS }}
 
-      - name: Clean up
-        run: |
-          echo "Data processing completed and changes pushed."
 
 
 
