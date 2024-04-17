@@ -73,7 +73,3 @@ jobs:
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
         env:
           IIS: ${{ secrets.IIS }}
-
-
-
-
