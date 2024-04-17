@@ -109,15 +109,19 @@ jobs:
           mkdir -p backup
           cp data/processed/*.csv backup/
 
-      - name: DVC pull (force overwrite)
-        run: dvc pull -r origin --force
+      - name: Pull data with DVC
+        run: dvc pull data/raw/weather
 
-      - name: Fetch weather data
+      - name: Run Python script to generate/update data
         run: python src/data/fetch_weather_data.py
 
-      - name: DVC push new weather data
+      - name: Add and commit data to DVC
         run: |
-          dvc push data/raw/weather
+          dvc add data/raw/weather
+          git add data/raw/weather.dvc data/.gitignore
+          git commit -m "Update weather data"
+          dvc push
+
 
 
   preprocess_weather_data:
