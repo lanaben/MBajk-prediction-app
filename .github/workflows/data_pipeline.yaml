@@ -104,11 +104,6 @@ jobs:
           dvc remote modify origin --local access_key_id 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55
           dvc remote modify origin --local secret_access_key 7ddc36c3f8a57b0df9f619f50e6f0a2cf6da5f55
 
-      - name: Backup conflicting data
-        run: |
-          mkdir -p backup
-          cp data/raw/weather/*.json backup/
-
       - name: Pull data with DVC
         run: dvc pull data/raw/weather --force
 
@@ -118,10 +113,9 @@ jobs:
       - name: Add and commit data to DVC
         run: |
           dvc add data/raw/weather
+          dvc push
           git add data/raw/weather.dvc data/.gitignore
           git commit -m "Update weather data"
-          dvc push
-
 
 
   preprocess_weather_data:
