@@ -1,0 +1,6 @@
+outs:
+- md5: a3b3b2f5c62056fe8ab19ccce955abf8.dir
+  size: 11814
+  nfiles: 29
+  hash: md5
+  path: bikes
