@@ -1,9 +1,8 @@
 name: Data Pipeline
 
 on:
-  push:
-    branches:
-      - main
+  schedule:
+    - cron: '*/30 * * * *'
 
 jobs:
   setup:
@@ -211,6 +210,50 @@ jobs:
           dvc status
           dvc push
           git commit -m "Process bike data."
+          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+        env:
+          IIS: ${{ secrets.IIS }}
+
+  merge_data:
+    needs: process_bike_data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install DVC
+        run: |
+          pip install dvc
+          dvc --version
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Configure DVC
+        run: |
+          dvc remote add -f origin s3://dvc
+          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+
+      - name: Pull data with DVC
+        run: dvc pull --force
+
+      - name: Add and commit data to DVC
+        run: |
+          git config --global user.name 'lanaben'
+          git config --global user.email 'lanaben@users.noreply.github.com'
+          git fetch origin main
+          git rebase origin/main        
+          python src/data/merge_data.py
+          dvc add data
+          git add data.dvc
+          dvc status
+          dvc push
+          git commit -m "Merge data."
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
         env:
           IIS: ${{ secrets.IIS }}
