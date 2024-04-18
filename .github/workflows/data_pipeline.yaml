@@ -70,6 +70,7 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           python src/data/fetch_weather_data.py
           dvc add data
+          git add data.dvc
           dvc status
           dvc push
         env:
@@ -108,6 +109,7 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           python src/data/fetch_bike_data.py
           dvc add data
+          git add data.dvc
           dvc status
           dvc push
         env:
@@ -145,6 +147,7 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           python src/data/process_weather_data.py
           dvc add data
+          git add data.dvc
           dvc status
           dvc push
         env:
@@ -182,6 +185,7 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           python src/data/process_bike_data.py
           dvc add data
+          git add data.dvc
           dvc status
           dvc push
         env:
@@ -216,7 +220,6 @@ jobs:
 
       - name: Commit changes
         run: |
-          git add data.dvc
           git status
           git commit -m "Update data files." || echo "No changes to commit."
 
