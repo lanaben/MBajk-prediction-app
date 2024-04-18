@@ -1,9 +1,0 @@
-[core]
-    remote = origin
-    autostage = true
-[cache]
-    type = copy
-    protected = false
-['remote "origin"']
-    url = s3://dvc
-    endpointurl = https://dagshub.com/lanaben/MBajk-prediction-app.s3
