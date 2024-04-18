@@ -1,0 +1,17 @@
+{
+    "number": 17,
+    "contract_name": "maribor",
+    "name": "NA POLJANAH - HEROJA \u0160ERCERJA",
+    "address": "NA POLJANAH 53",
+    "position": {
+        "lat": 46.553109,
+        "lng": 15.624098
+    },
+    "banking": false,
+    "bonus": false,
+    "bike_stands": 20,
+    "available_bike_stands": 8,
+    "available_bikes": 12,
+    "status": "OPEN",
+    "last_update": 1713448084000
+}

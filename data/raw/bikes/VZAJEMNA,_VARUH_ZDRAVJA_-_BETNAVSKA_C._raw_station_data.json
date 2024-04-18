@@ -1,0 +1,17 @@
+{
+    "number": 24,
+    "contract_name": "maribor",
+    "name": "VZAJEMNA, VARUH ZDRAVJA - BETNAVSKA C.",
+    "address": "Betnavska c. 83",
+    "position": {
+        "lat": 46.54199,
+        "lng": 15.63831
+    },
+    "banking": false,
+    "bonus": false,
+    "bike_stands": 20,
+    "available_bike_stands": 6,
+    "available_bikes": 14,
+    "status": "OPEN",
+    "last_update": 1713451731000
+}

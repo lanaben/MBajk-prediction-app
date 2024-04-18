@@ -1,0 +1,17 @@
+{
+    "number": 29,
+    "contract_name": "maribor",
+    "name": "PETROL \u2013 LENT \u2013 VODNI STOLP",
+    "address": "Usnjarska ulica 5",
+    "position": {
+        "lat": 46.556534,
+        "lng": 15.647629
+    },
+    "banking": false,
+    "bonus": false,
+    "bike_stands": 20,
+    "available_bike_stands": 18,
+    "available_bikes": 2,
+    "status": "OPEN",
+    "last_update": 1713451172000
+}
