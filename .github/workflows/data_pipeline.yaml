@@ -71,6 +71,7 @@ jobs:
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
           git fetch origin main
+          git pull --rebase origin main
           python src/data/fetch_weather_data.py
           dvc add data
           git add data.dvc
@@ -115,6 +116,7 @@ jobs:
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
           git fetch origin main   
+          git pull --rebase origin main
           python src/data/fetch_bike_data.py
           dvc add data
           git add data.dvc
@@ -158,6 +160,7 @@ jobs:
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
           git fetch origin main
+          git pull --rebase origin main
           python src/data/process_weather_data.py
           dvc add data
           git add data.dvc
@@ -200,7 +203,8 @@ jobs:
         run: |
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
-          git fetch origin main    
+          git fetch origin main 
+          git pull --rebase origin main
           python src/data/process_bike_data.py
           dvc add data
           git add data.dvc
@@ -244,6 +248,7 @@ jobs:
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
           git fetch origin main    
+          git pull --rebase origin main
           python src/data/merge_data.py
           dvc add data
           git add data.dvc
