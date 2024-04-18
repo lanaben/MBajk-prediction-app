@@ -201,7 +201,7 @@ jobs:
 
       - name: Commit changes
         run: |
-          git add .
+          git add data.dvc
           git status
           git commit -m "Update data files." || echo "No changes to commit."
 
