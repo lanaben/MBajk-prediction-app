@@ -5,8 +5,8 @@ import unicodedata
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(ROOT_DIR, '..', '..', 'data')
-raw_data_dir = os.path.join(DATA_DIR, "raw")
-os.makedirs(raw_data_dir, exist_ok=True)
+raw_bike_data_dir = os.path.join(DATA_DIR, "raw", "bikes")
+os.makedirs(raw_bike_data_dir, exist_ok=True)
 
 API_KEY = '5e150537116dbc1786ce5bec6975a8603286526b'
 CONTRACT = 'maribor'
@@ -26,7 +26,7 @@ def fetch_bike_data():
 
 def save_station_data(station):
     station_name = normalize_station_name(station['name'])
-    file_path = os.path.join(raw_data_dir, f"{station_name}_raw_station_data.json")
+    file_path = os.path.join(raw_bike_data_dir, f"{station_name}_raw_station_data.json")
     with open(file_path, 'w') as file:
         json.dump(station, file, indent=4)
 
