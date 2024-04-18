@@ -70,11 +70,8 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           python src/data/fetch_weather_data.py
           dvc add data
-          git add data.dvc
           dvc status
           dvc push
-          git commit -m "Update weather data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
         env:
           IIS: ${{ secrets.IIS }}
 
@@ -111,11 +108,8 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           python src/data/fetch_bike_data.py
           dvc add data
-          git add data.dvc
           dvc status
           dvc push
-          git commit -m "Update bike data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
         env:
           IIS: ${{ secrets.IIS }}
 
@@ -151,11 +145,8 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           python src/data/process_weather_data.py
           dvc add data
-          git add data.dvc
           dvc status
           dvc push
-          git commit -m "Process weather data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
         env:
           IIS: ${{ secrets.IIS }}
 
@@ -191,10 +182,29 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           python src/data/process_bike_data.py
           dvc add data
-          git add data.dvc
           dvc status
           dvc push
-          git commit -m "Process bike data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
         env:
           IIS: ${{ secrets.IIS }}
+
+  commit_and_push:
+    needs: [fetch_weather_data, fetch_bike_data, process_weather_data, process_bike_data]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'lanaben'
+          git config --global user.email 'lanaben@users.noreply.github.com'
+
+      - name: Commit changes
+        run: |
+          git add .
+          git status
+          git commit -m "Update data files." || echo "No changes to commit."
+
+      - name: Push changes
+        run:
+          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
