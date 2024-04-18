@@ -12,3 +12,4 @@ data/raw/bike/*
 # But do not ignore the .dvc file
 !data/raw/bike.dvc
 
+/data
