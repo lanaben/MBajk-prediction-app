@@ -199,6 +199,12 @@ jobs:
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
 
+      - name: Check DVC Status
+        run: dvc status
+
+      - name: Check Git Status
+        run: git status
+
       - name: Commit changes
         run: |
           git add data.dvc
