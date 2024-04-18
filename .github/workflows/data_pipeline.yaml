@@ -74,7 +74,7 @@ jobs:
           git pull --rebase origin main
           python src/data/fetch_weather_data.py
           dvc add data/raw/weather
-          git add data/weather.dvc data/weather/
+          git add data/raw/weather.dvc data/raw/weather/
           dvc status
           dvc push
           git commit -m "Fetch weather data."
@@ -119,7 +119,7 @@ jobs:
           git pull --rebase origin main
           python src/data/fetch_bike_data.py
           dvc add data/raw/bikes
-          git add data/bikes.dvc data/bikes/
+          git add data/raw/bikes.dvc data/raw/bikes/
           dvc status
           dvc push
           git commit -m "Fetch bike data."
