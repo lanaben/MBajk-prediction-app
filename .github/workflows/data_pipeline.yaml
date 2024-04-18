@@ -3,6 +3,7 @@ name: Data Pipeline
 on:
   schedule:
     - cron: '*/30 * * * *'
+  workflow_dispatch:
 
 jobs:
   setup:
