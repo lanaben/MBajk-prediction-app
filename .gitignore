@@ -4,7 +4,7 @@ __pycache__/
 data/raw/weather/*
 
 # But do not ignore the .dvc file
-!data/raw/weather.dvc
+!data/raw/weather/weather.dvc
 
 # Ignore everything in the weather directory
 data/raw/bike/*

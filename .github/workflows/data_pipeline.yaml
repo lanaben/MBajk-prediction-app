@@ -119,7 +119,7 @@ jobs:
           git pull --rebase origin main
           python src/data/fetch_bike_data.py
           dvc add data/raw/bikes
-          git add data/raw/bikes.dvc data/raw/bikes/
+          git add data/raw/bikes/bikes.dvc data/raw/bikes/
           dvc status
           dvc push
           git commit -m "Fetch bike data."
