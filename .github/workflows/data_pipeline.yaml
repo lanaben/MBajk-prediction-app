@@ -44,6 +44,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Install DVC
         run: |
@@ -68,6 +70,8 @@ jobs:
         run: |
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
+          git fetch origin main
+          git rebase origin/main
           python src/data/fetch_weather_data.py
           dvc add data
           git add data.dvc
@@ -85,6 +89,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Install DVC
         run: |
@@ -109,6 +115,8 @@ jobs:
         run: |
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
+          git fetch origin main
+          git rebase origin/main          
           python src/data/fetch_bike_data.py
           dvc add data
           git add data.dvc
@@ -125,6 +133,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Install DVC
         run: |
@@ -149,6 +159,8 @@ jobs:
         run: |
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
+          git fetch origin main
+          git rebase origin/main 
           python src/data/process_weather_data.py
           dvc add data
           git add data.dvc
@@ -165,6 +177,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Install DVC
         run: |
@@ -189,6 +203,8 @@ jobs:
         run: |
           git config --global user.name 'lanaben'
           git config --global user.email 'lanaben@users.noreply.github.com'
+          git fetch origin main
+          git rebase origin/main        
           python src/data/process_bike_data.py
           dvc add data
           git add data.dvc
