@@ -160,7 +160,7 @@ jobs:
           IIS: ${{ secrets.IIS }}
 
   process_bike_data:
-    needs: [ setup, fetch_weather_data ]
+    needs: [ setup, fetch_bike_data ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
