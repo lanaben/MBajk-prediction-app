@@ -1,2 +1,14 @@
 __pycache__/
 *.py[cod]
+# Ignore everything in the weather directory
+data/raw/weather/*
+
+# But do not ignore the .dvc file
+!data/raw/weather.dvc
+
+# Ignore everything in the weather directory
+data/raw/bike/*
+
+# But do not ignore the .dvc file
+!data/raw/bike.dvc
+
