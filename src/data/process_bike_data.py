@@ -15,10 +15,15 @@ def process_bike_data(raw_data_dir, processed_data_dir):
             csv_filename = filename.replace('_raw_station_data.json', '_processed_bike_data.csv')
             csv_file_path = os.path.join(processed_data_dir, csv_filename)
 
-            with open(csv_file_path, 'w', newline='') as csvfile:
+            # Open the CSV file in append mode
+            file_exists = os.path.exists(csv_file_path)
+            with open(csv_file_path, 'a', newline='') as csvfile:
                 fieldnames = ['datetime', 'bike_stands', 'available_bike_stands']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                writer.writeheader()
+
+                # Write header only if the file did not exist before
+                if not file_exists:
+                    writer.writeheader()
 
                 if isinstance(station_data, dict):
                     record = {
