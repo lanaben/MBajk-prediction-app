@@ -268,7 +268,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Install DVC
         run: |
@@ -292,6 +292,7 @@ jobs:
       - name: Checkout and copy previous data version
         run: |
           git checkout HEAD^
+          dvc fetch
           dvc checkout
           cp -r data/processed data/processed_reference
 
