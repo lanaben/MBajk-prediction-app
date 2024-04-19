@@ -13,3 +13,4 @@ data/raw/bike/*
 !data/raw/bike.dvc
 
 /data
+venv
