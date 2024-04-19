@@ -72,6 +72,7 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           git fetch origin main
           git pull --rebase origin main
+          python src/tests/test_data_source.py
           python src/data/fetch_weather_data.py
           dvc add data/raw/weather
           git add data.dvc
@@ -117,6 +118,7 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           git fetch origin main   
           git pull --rebase origin main
+          python src/tests/test_data_source.py
           python src/data/fetch_bike_data.py
           dvc add data/raw/bikes
           git add data.dvc

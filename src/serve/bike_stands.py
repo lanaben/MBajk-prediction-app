@@ -13,7 +13,7 @@ app = Flask(__name__)
 CORS(app)
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-RAW_DATA_DIR = os.path.join(ROOT_DIR, 'data', 'raw')
+RAW_DATA_DIR = os.path.join(ROOT_DIR, 'data', 'raw', 'bikes')
 PROCESSED_DATA_DIR = os.path.join(ROOT_DIR, 'data', 'processed')
 MODELS_DIR = os.path.join(ROOT_DIR, 'models')
 
