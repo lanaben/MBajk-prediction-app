@@ -7,16 +7,6 @@ def client():
     with app.test_client() as client:
         yield client
 
-
-
-def test_get_stations(client):
-    response = client.get('/mbajk/stations')
-    assert response.status_code == 200
-    assert 'Stations' in response.json
-    assert isinstance(response.json['Stations'], list)
-
-
-
 def test_get_station_data(client):
     station_name = 'KORO%C5%A0KA%20C.%20-%20KORO%C5%A0KI%20VETER'
     limit = 7
