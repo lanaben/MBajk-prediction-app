@@ -307,5 +307,5 @@ jobs:
 
       - name: Validate Data with Great Expectations
         run: |
-          great_expectations --v3-api checkpoint run processed_checkpoint
+          great_expectations checkpoint run processed_checkpoint
 
