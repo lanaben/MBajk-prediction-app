@@ -260,3 +260,52 @@ jobs:
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
         env:
           IIS: ${{ secrets.IIS }}
+
+  validate_data:
+    needs: merge_data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Install DVC
+        run: |
+          pip install dvc
+          dvc --version
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Configure DVC
+        run: |
+          dvc remote add -f origin s3://dvc
+          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+
+      - name: Pull data with DVC
+        run: dvc pull
+
+      - name: Checkout and copy previous data version
+        run: |
+          git checkout HEAD^
+          dvc checkout
+          cp -r data/processed data/processed_reference
+
+      - name: Checkout and copy latest data version
+        run: |
+          git checkout main
+          dvc checkout
+          cp -r data/processed data/processed_current
+
+      - name: Install Great Expectations
+        run: |
+          pip install great_expectations
+
+      - name: Validate Data with Great Expectations
+        run: |
+          great_expectations --v3-api checkpoint run processed_checkpoint
+

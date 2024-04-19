@@ -21,7 +21,7 @@ datasources:
     data_connectors:
       default_inferred_data_connector:
         class_name: InferredAssetFilesystemDataConnector
-        base_directory: C:\Faks\Feri\IIS\ML-engineering\data\processed
+        base_directory: ./data/processed/
         glob_directive: "*.csv"
         default_regex:
           pattern: (.+)_processed_data\.csv
