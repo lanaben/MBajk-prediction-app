@@ -17,7 +17,7 @@ def load_data(directory):
     return pd.concat(data_frames, ignore_index=True)
 
 reference_data = load_data("reference_data")
-current_data = load_data("current_data")
+current_data = load_data("processed_current")
 
 report = Report(metrics=[DataDriftPreset()])
 report.run(reference_data=reference_data, current_data=current_data)
