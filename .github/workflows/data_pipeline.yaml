@@ -346,6 +346,7 @@ jobs:
       - name: Install DVC
         run: |
           pip install dvc
+          pip install evidently
           dvc --version
 
       - name: Install dependencies
