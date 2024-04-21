@@ -289,18 +289,26 @@ jobs:
       - name: Pull data with DVC
         run: dvc pull
 
+      - name: Copy latest data version
+        run: |
+          cp -r data/processed data/processed_current
+          dvc add data/processed_current
+          git add data.dvc
+          git commit -m "Track current processed data with DVC."
+          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+
       - name: Checkout and copy previous data version
         run: |
           git checkout HEAD^
-          dvc fetch
-          dvc checkout
-          cp -r data/processed data/processed_reference
-
-      - name: Checkout and copy latest data version
-        run: |
-          git checkout main
-          dvc checkout
-          cp -r data/processed data/processed_current
+          git checkout -b temp-branch
+          dvc pull
+          cp -r data/processed data/reference_data
+          dvc add data/reference_data
+          git add data.dvc
+          git checkout main     
+          git checkout temp-branch -- data/reference_data.dvc
+          git commit -m "Track referenced processed data with DVC."
+          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
 
       - name: Install Great Expectations
         run: |
@@ -318,5 +326,42 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+  test_data:
+    needs: validate_data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install DVC
+        run: |
+          pip install dvc
+          dvc --version
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Configure DVC
+        run: |
+          dvc remote add -f origin s3://dvc
+          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+
+      - name: Add and commit test report
+        run: |
+          git config --global user.name 'lanaben'
+          git config --global user.email 'lanaben@users.noreply.github.com'
+          git fetch origin main 
+          git pull --rebase origin main
+          python test.py
+          git commit -m "Test bike data."
+          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+        env:
+          IIS: ${{ secrets.IIS }}
 
 
