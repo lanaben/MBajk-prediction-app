@@ -304,6 +304,7 @@ jobs:
 
       - name: Checkout and copy previous data version
         run: |
+          git fetch --all
           git checkout HEAD^
           git checkout -b temp-branch
           dvc pull
@@ -315,6 +316,7 @@ jobs:
           git checkout main     
           git checkout temp-branch -- data/reference_data.dvc
           dvc push
+          git add data.dvc
           git commit -m "Track referenced processed data with DVC."
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
 
