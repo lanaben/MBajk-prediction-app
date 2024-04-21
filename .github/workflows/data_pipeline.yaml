@@ -295,11 +295,9 @@ jobs:
           git config --global user.email 'lanaben@users.noreply.github.com'
           git fetch origin main    
           git pull --rebase origin main
-          cp -r data/processed data/processed_current
-          dvc add data/processed_current
-          git add data.dvc
-          dvc push
-          git commit -m "Track current processed data with DVC."
+          cp -r data/processed processed_current
+          git add processed_current
+          git commit -m "Track current processed data."
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
 
       - name: Checkout and copy previous data version
@@ -308,16 +306,14 @@ jobs:
           git checkout HEAD^
           git checkout -b temp-branch
           dvc pull
-          cp -r data/processed data/reference_data
-          dvc add data/reference_data
-          git add data.dvc
+          cp -r data/processed reference_data
+          git add reference_data
           git commit -m "Referenced processed data on temp branch."
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
           git checkout main     
-          git checkout temp-branch -- data/reference_data.dvc
-          dvc push
-          git add data.dvc
-          git commit -m "Track referenced processed data with DVC."
+          git checkout temp-branch -- reference_data
+          git add reference_data
+          git commit -m "Track referenced processed data."
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
 
       - name: Install Great Expectations
