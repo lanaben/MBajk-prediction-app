@@ -373,7 +373,7 @@ jobs:
           IIS: ${{ secrets.IIS }}
 
   split_data:
-    needs: process_weather_data
+    needs: test_data
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
