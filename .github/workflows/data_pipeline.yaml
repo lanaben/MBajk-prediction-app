@@ -291,9 +291,12 @@ jobs:
 
       - name: Copy latest data version
         run: |
+          git config --global user.name 'lanaben'
+          git config --global user.email 'lanaben@users.noreply.github.com'
           cp -r data/processed data/processed_current
           dvc add data/processed_current
           git add data.dvc
+          dvc push
           git commit -m "Track current processed data with DVC."
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
 
@@ -307,6 +310,7 @@ jobs:
           git add data.dvc
           git checkout main     
           git checkout temp-branch -- data/reference_data.dvc
+          dvc push
           git commit -m "Track referenced processed data with DVC."
           git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
 
