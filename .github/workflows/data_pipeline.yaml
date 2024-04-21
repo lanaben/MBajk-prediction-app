@@ -367,8 +367,12 @@ jobs:
           git fetch origin main 
           git pull --rebase origin main
           python test.py
-          git commit -m "Test bike data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit."
+          else
+            git commit -am "Test bike data."
+            git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+          fi
         env:
           IIS: ${{ secrets.IIS }}
 
