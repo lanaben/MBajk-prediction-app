@@ -310,6 +310,8 @@ jobs:
           cp -r data/processed data/reference_data
           dvc add data/reference_data
           git add data.dvc
+          git commit -m "Referenced processed data on temp branch."
+          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
           git checkout main     
           git checkout temp-branch -- data/reference_data.dvc
           dvc push
@@ -370,6 +372,50 @@ jobs:
         env:
           IIS: ${{ secrets.IIS }}
 
+  split_data:
+    needs: process_weather_data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install DVC
+        run: |
+          pip install dvc
+          dvc --version
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Configure DVC
+        run: |
+          dvc remote add -f origin s3://dvc
+          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+
+      - name: Pull data with DVC
+        run: dvc pull
+
+      - name: Add and commit data to DVC
+        run: |
+          git config --global user.name 'lanaben'
+          git config --global user.email 'lanaben@users.noreply.github.com'
+          git fetch origin main 
+          git pull --rebase origin main
+          python split_data.py
+          dvc add data/train
+          dvc add data/test
+          git add data.dvc
+          dvc status
+          dvc push
+          git commit -m "Split data."
+          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+        env:
+          IIS: ${{ secrets.IIS }}
 
 
 
