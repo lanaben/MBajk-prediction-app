@@ -20,7 +20,7 @@ def split_data_folder(input_folder, output_train_folder, output_test_folder, tes
             train.to_csv(os.path.join(output_train_folder, f'train_{filename}'), index=False)
             test.to_csv(os.path.join(output_test_folder, f'test_{filename}'), index=False)
 
-input_folder = 'data/processed_current'
+input_folder = 'processed_current/processed'
 output_train_folder = 'data/train'
 output_test_folder = 'data/test'
 
