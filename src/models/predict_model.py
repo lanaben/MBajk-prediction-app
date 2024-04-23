@@ -35,8 +35,6 @@ with dagshub_logger() as logger:
         run_name = os.path.basename(train_file).replace('.csv', '')
 
         with mlflow.start_run(run_name=run_name):
-            folder_name = os.path.basename(os.path.dirname(train_file))
-            mlflow.log_param("Folder Name", folder_name)
             print(f"Training on: {train_file}")
             print(f"Testing on: {test_file}")
 

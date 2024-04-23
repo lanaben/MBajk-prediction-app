@@ -1,425 +1,425 @@
-name: Data Pipeline
-
-on:
-  schedule:
-    - cron: '*/30 * * * *'
-  workflow_dispatch:
-
-jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.11.3'
-
-      - name: Cache Python dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install DVC
-        run: |
-          pip install dvc
-          dvc --version
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install dvc
-
-
-  fetch_weather_data:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Install DVC
-        run: |
-          pip install dvc
-          dvc --version
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Configure DVC
-        run: |
-          dvc remote add -f origin s3://dvc
-          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
-          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
-          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
-
-      - name: Pull data with DVC
-        run: dvc pull
-
-      - name: Add and commit data to DVC
-        run: |
-          git config --global user.name 'lanaben'
-          git config --global user.email 'lanaben@users.noreply.github.com'
-          git fetch origin main
-          git pull --rebase origin main
-          python src/tests/test_data_source.py
-          python src/data/fetch_weather_data.py
-          dvc add data/raw/weather
-          git add data.dvc
-          dvc status
-          dvc push
-          git commit -m "Fetch weather data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
-        env:
-          IIS: ${{ secrets.IIS }}
-
-
-  fetch_bike_data:
-    needs: fetch_weather_data
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Install DVC
-        run: |
-          pip install dvc
-          dvc --version
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Configure DVC
-        run: |
-          dvc remote add -f origin s3://dvc
-          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
-          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
-          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
-
-      - name: Pull data with DVC
-        run: dvc pull
-
-      - name: Add and commit data to DVC
-        run: |
-          git config --global user.name 'lanaben'
-          git config --global user.email 'lanaben@users.noreply.github.com'
-          git fetch origin main   
-          git pull --rebase origin main
-          python src/tests/test_data_source.py
-          python src/data/fetch_bike_data.py
-          dvc add data/raw/bikes
-          git add data.dvc
-          dvc status
-          dvc push
-          git commit -m "Fetch bike data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
-        env:
-          IIS: ${{ secrets.IIS }}
-
-  process_weather_data:
-    needs: fetch_bike_data
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Install DVC
-        run: |
-          pip install dvc
-          dvc --version
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Configure DVC
-        run: |
-          dvc remote add -f origin s3://dvc
-          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
-          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
-          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
-
-      - name: Pull data with DVC
-        run: dvc pull
-
-      - name: Add and commit data to DVC
-        run: |
-          git config --global user.name 'lanaben'
-          git config --global user.email 'lanaben@users.noreply.github.com'
-          git fetch origin main
-          git pull --rebase origin main
-          python src/data/process_weather_data.py
-          dvc add data/processed_weather_data
-          git add data.dvc
-          dvc status
-          dvc push
-          git commit -m "Process weather data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
-        env:
-          IIS: ${{ secrets.IIS }}
-
-  process_bike_data:
-    needs: process_weather_data
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Install DVC
-        run: |
-          pip install dvc
-          dvc --version
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Configure DVC
-        run: |
-          dvc remote add -f origin s3://dvc
-          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
-          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
-          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
-
-      - name: Pull data with DVC
-        run: dvc pull
-
-      - name: Add and commit data to DVC
-        run: |
-          git config --global user.name 'lanaben'
-          git config --global user.email 'lanaben@users.noreply.github.com'
-          git fetch origin main 
-          git pull --rebase origin main
-          python src/data/process_bike_data.py
-          dvc add data/processed_bike_data
-          git add data.dvc
-          dvc status
-          dvc push
-          git commit -m "Process bike data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
-        env:
-          IIS: ${{ secrets.IIS }}
-
-  merge_data:
-    needs: process_bike_data
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Install DVC
-        run: |
-          pip install dvc
-          dvc --version
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Configure DVC
-        run: |
-          dvc remote add -f origin s3://dvc
-          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
-          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
-          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
-
-      - name: Pull data with DVC
-        run: dvc pull
-
-      - name: Add and commit data to DVC
-        run: |
-          git config --global user.name 'lanaben'
-          git config --global user.email 'lanaben@users.noreply.github.com'
-          git fetch origin main    
-          git pull --rebase origin main
-          python src/data/merge_data.py
-          dvc add data/processed
-          git add data.dvc
-          dvc status
-          dvc push
-          git commit -m "Merge data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
-        env:
-          IIS: ${{ secrets.IIS }}
-
-  validate_data:
-    needs: merge_data
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Install DVC
-        run: |
-          pip install dvc
-          pip install evidently
-          dvc --version
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Configure DVC
-        run: |
-          dvc remote add -f origin s3://dvc
-          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
-          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
-          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
-
-      - name: Pull data with DVC
-        run: dvc pull
-
-      - name: Copy latest data version
-        run: |
-          git config --global user.name 'lanaben'
-          git config --global user.email 'lanaben@users.noreply.github.com'
-          git fetch origin main    
-          git pull --rebase origin main
-          cp -r data/processed processed_current
-          git add processed_current
-          git commit -m "Track current processed data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
-
-      - name: Checkout and copy previous data version
-        run: |
-          git fetch --all
-          git checkout HEAD^
-          git checkout -b temp-branch
-          dvc pull
-          cp -r data/processed reference_data
-          git add reference_data
-          git commit -m "Referenced processed data on temp branch."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
-          git checkout main     
-          git checkout temp-branch -- reference_data
-          git add reference_data
-          git commit -m "Track referenced processed data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
-
-      - name: Install Great Expectations
-        run: |
-          pip install great_expectations
-
-      - name: Validate Data with Great Expectations
-        run: |
-          great_expectations checkpoint run processed_checkpoint
-
-      - name: Deploy DataDocs to Netlify
-        uses: nwtgck/actions-netlify@v1.2
-        with:
-          publish-dir: "gx/uncommitted/data_docs/local_site"
-          production-deploy: true
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-
-  test_data:
-    needs: validate_data
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Install DVC
-        run: |
-          pip install dvc
-          pip install evidently
-          dvc --version
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Configure DVC
-        run: |
-          dvc remote add -f origin s3://dvc
-          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
-          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
-          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
-
-      - name: Add and commit test report
-        run: |
-          git config --global user.name 'lanaben'
-          git config --global user.email 'lanaben@users.noreply.github.com'
-          git fetch origin main 
-          git pull --rebase origin main
-          python test.py
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "No changes to commit."
-          else
-            git commit -am "Test bike data."
-            git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
-          fi
-        env:
-          IIS: ${{ secrets.IIS }}
-
-  split_data:
-    needs: test_data
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Install DVC
-        run: |
-          pip install dvc
-          dvc --version
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Configure DVC
-        run: |
-          dvc remote add -f origin s3://dvc
-          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
-          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
-          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
-
-      - name: Pull data with DVC
-        run: dvc pull
-
-      - name: Add and commit data to DVC
-        run: |
-          git config --global user.name 'lanaben'
-          git config --global user.email 'lanaben@users.noreply.github.com'
-          git fetch origin main 
-          git pull --rebase origin main
-          python split_data.py
-          dvc add data/train
-          dvc add data/test
-          git add data.dvc
-          dvc status
-          dvc push
-          git commit -m "Split data."
-          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
-        env:
-          IIS: ${{ secrets.IIS }}
-
-
-
+#name: Data Pipeline
+#
+#on:
+#  schedule:
+#    - cron: '*/30 * * * *'
+#  workflow_dispatch:
+#
+#jobs:
+#  setup:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Set up Python
+#        uses: actions/setup-python@v2
+#        with:
+#          python-version: '3.11.3'
+#
+#      - name: Cache Python dependencies
+#        uses: actions/cache@v2
+#        with:
+#          path: ~/.cache/pip
+#          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+#          restore-keys: |
+#            ${{ runner.os }}-pip-
+#
+#      - name: Install DVC
+#        run: |
+#          pip install dvc
+#          dvc --version
+#
+#      - name: Install dependencies
+#        run: |
+#          pip install -r requirements.txt
+#          pip install dvc
+#
+#
+#  fetch_weather_data:
+#    needs: setup
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Install DVC
+#        run: |
+#          pip install dvc
+#          dvc --version
+#
+#      - name: Install dependencies
+#        run: |
+#          pip install -r requirements.txt
+#
+#      - name: Configure DVC
+#        run: |
+#          dvc remote add -f origin s3://dvc
+#          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+#          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+#          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+#
+#      - name: Pull data with DVC
+#        run: dvc pull
+#
+#      - name: Add and commit data to DVC
+#        run: |
+#          git config --global user.name 'lanaben'
+#          git config --global user.email 'lanaben@users.noreply.github.com'
+#          git fetch origin main
+#          git pull --rebase origin main
+#          python src/tests/test_data_source.py
+#          python src/data/fetch_weather_data.py
+#          dvc add data/raw/weather
+#          git add data.dvc
+#          dvc status
+#          dvc push
+#          git commit -m "Fetch weather data."
+#          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+#        env:
+#          IIS: ${{ secrets.IIS }}
+#
+#
+#  fetch_bike_data:
+#    needs: fetch_weather_data
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Install DVC
+#        run: |
+#          pip install dvc
+#          dvc --version
+#
+#      - name: Install dependencies
+#        run: |
+#          pip install -r requirements.txt
+#
+#      - name: Configure DVC
+#        run: |
+#          dvc remote add -f origin s3://dvc
+#          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+#          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+#          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+#
+#      - name: Pull data with DVC
+#        run: dvc pull
+#
+#      - name: Add and commit data to DVC
+#        run: |
+#          git config --global user.name 'lanaben'
+#          git config --global user.email 'lanaben@users.noreply.github.com'
+#          git fetch origin main
+#          git pull --rebase origin main
+#          python src/tests/test_data_source.py
+#          python src/data/fetch_bike_data.py
+#          dvc add data/raw/bikes
+#          git add data.dvc
+#          dvc status
+#          dvc push
+#          git commit -m "Fetch bike data."
+#          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+#        env:
+#          IIS: ${{ secrets.IIS }}
+#
+#  process_weather_data:
+#    needs: fetch_bike_data
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Install DVC
+#        run: |
+#          pip install dvc
+#          dvc --version
+#
+#      - name: Install dependencies
+#        run: |
+#          pip install -r requirements.txt
+#
+#      - name: Configure DVC
+#        run: |
+#          dvc remote add -f origin s3://dvc
+#          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+#          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+#          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+#
+#      - name: Pull data with DVC
+#        run: dvc pull
+#
+#      - name: Add and commit data to DVC
+#        run: |
+#          git config --global user.name 'lanaben'
+#          git config --global user.email 'lanaben@users.noreply.github.com'
+#          git fetch origin main
+#          git pull --rebase origin main
+#          python src/data/process_weather_data.py
+#          dvc add data/processed_weather_data
+#          git add data.dvc
+#          dvc status
+#          dvc push
+#          git commit -m "Process weather data."
+#          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+#        env:
+#          IIS: ${{ secrets.IIS }}
+#
+#  process_bike_data:
+#    needs: process_weather_data
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Install DVC
+#        run: |
+#          pip install dvc
+#          dvc --version
+#
+#      - name: Install dependencies
+#        run: |
+#          pip install -r requirements.txt
+#
+#      - name: Configure DVC
+#        run: |
+#          dvc remote add -f origin s3://dvc
+#          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+#          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+#          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+#
+#      - name: Pull data with DVC
+#        run: dvc pull
+#
+#      - name: Add and commit data to DVC
+#        run: |
+#          git config --global user.name 'lanaben'
+#          git config --global user.email 'lanaben@users.noreply.github.com'
+#          git fetch origin main
+#          git pull --rebase origin main
+#          python src/data/process_bike_data.py
+#          dvc add data/processed_bike_data
+#          git add data.dvc
+#          dvc status
+#          dvc push
+#          git commit -m "Process bike data."
+#          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+#        env:
+#          IIS: ${{ secrets.IIS }}
+#
+#  merge_data:
+#    needs: process_bike_data
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Install DVC
+#        run: |
+#          pip install dvc
+#          dvc --version
+#
+#      - name: Install dependencies
+#        run: |
+#          pip install -r requirements.txt
+#
+#      - name: Configure DVC
+#        run: |
+#          dvc remote add -f origin s3://dvc
+#          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+#          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+#          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+#
+#      - name: Pull data with DVC
+#        run: dvc pull
+#
+#      - name: Add and commit data to DVC
+#        run: |
+#          git config --global user.name 'lanaben'
+#          git config --global user.email 'lanaben@users.noreply.github.com'
+#          git fetch origin main
+#          git pull --rebase origin main
+#          python src/data/merge_data.py
+#          dvc add data/processed
+#          git add data.dvc
+#          dvc status
+#          dvc push
+#          git commit -m "Merge data."
+#          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+#        env:
+#          IIS: ${{ secrets.IIS }}
+#
+#  validate_data:
+#    needs: merge_data
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Install DVC
+#        run: |
+#          pip install dvc
+#          pip install evidently
+#          dvc --version
+#
+#      - name: Install dependencies
+#        run: |
+#          pip install -r requirements.txt
+#
+#      - name: Configure DVC
+#        run: |
+#          dvc remote add -f origin s3://dvc
+#          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+#          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+#          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+#
+#      - name: Pull data with DVC
+#        run: dvc pull
+#
+#      - name: Copy latest data version
+#        run: |
+#          git config --global user.name 'lanaben'
+#          git config --global user.email 'lanaben@users.noreply.github.com'
+#          git fetch origin main
+#          git pull --rebase origin main
+#          cp -r data/processed processed_current
+#          git add processed_current
+#          git commit -m "Track current processed data."
+#          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+#
+#      - name: Checkout and copy previous data version
+#        run: |
+#          git fetch --all
+#          git checkout HEAD^
+#          git checkout -b temp-branch
+#          dvc pull
+#          cp -r data/processed reference_data
+#          git add reference_data
+#          git commit -m "Referenced processed data on temp branch."
+#          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+#          git checkout main
+#          git checkout temp-branch -- reference_data
+#          git add reference_data
+#          git commit -m "Track referenced processed data."
+#          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+#
+#      - name: Install Great Expectations
+#        run: |
+#          pip install great_expectations
+#
+#      - name: Validate Data with Great Expectations
+#        run: |
+#          great_expectations checkpoint run processed_checkpoint
+#
+#      - name: Deploy DataDocs to Netlify
+#        uses: nwtgck/actions-netlify@v1.2
+#        with:
+#          publish-dir: "gx/uncommitted/data_docs/local_site"
+#          production-deploy: true
+#        env:
+#          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+#          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+#
+#  test_data:
+#    needs: validate_data
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Install DVC
+#        run: |
+#          pip install dvc
+#          pip install evidently
+#          dvc --version
+#
+#      - name: Install dependencies
+#        run: |
+#          pip install -r requirements.txt
+#
+#      - name: Configure DVC
+#        run: |
+#          dvc remote add -f origin s3://dvc
+#          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+#          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+#          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+#
+#      - name: Add and commit test report
+#        run: |
+#          git config --global user.name 'lanaben'
+#          git config --global user.email 'lanaben@users.noreply.github.com'
+#          git fetch origin main
+#          git pull --rebase origin main
+#          python test.py
+#          if [ -z "$(git status --porcelain)" ]; then
+#            echo "No changes to commit."
+#          else
+#            git commit -am "Test bike data."
+#            git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+#          fi
+#        env:
+#          IIS: ${{ secrets.IIS }}
+#
+#  split_data:
+#    needs: test_data
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Install DVC
+#        run: |
+#          pip install dvc
+#          dvc --version
+#
+#      - name: Install dependencies
+#        run: |
+#          pip install -r requirements.txt
+#
+#      - name: Configure DVC
+#        run: |
+#          dvc remote add -f origin s3://dvc
+#          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+#          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+#          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+#
+#      - name: Pull data with DVC
+#        run: dvc pull
+#
+#      - name: Add and commit data to DVC
+#        run: |
+#          git config --global user.name 'lanaben'
+#          git config --global user.email 'lanaben@users.noreply.github.com'
+#          git fetch origin main
+#          git pull --rebase origin main
+#          python split_data.py
+#          dvc add data/train
+#          dvc add data/test
+#          git add data.dvc
+#          dvc status
+#          dvc push
+#          git commit -m "Split data."
+#          git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+#        env:
+#          IIS: ${{ secrets.IIS }}
+#
+#
+#
