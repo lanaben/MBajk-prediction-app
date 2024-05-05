@@ -16,8 +16,10 @@ def read_last_row(csv_file):
 
 
 def merge_data(processed_bike_data_dir, processed_weather_data_dir, merged_data_dir):
+
     os.makedirs(merged_data_dir, exist_ok=True)
     bike_files = [f for f in os.listdir(processed_bike_data_dir) if f.endswith('_processed_bike_data.csv')]
+
     for bike_filename in bike_files:
         bike_data_file = os.path.join(processed_bike_data_dir, bike_filename)
         weather_filename = bike_filename.replace('processed_bike', 'raw_weather')
@@ -47,6 +49,7 @@ def merge_data(processed_bike_data_dir, processed_weather_data_dir, merged_data_
                     last_weather_data[4],
                     last_weather_data[5]
                 ]
+
                 writer.writerow(dict(zip(fieldnames, merged_row)))
                 print(f"Data written to {merged_file_path}: {merged_row}")
 
@@ -57,4 +60,5 @@ if __name__ == "__main__":
     processed_bike_data_dir = os.path.join(DATA_DIR, "processed_bike_data")
     processed_weather_data_dir = os.path.join(DATA_DIR, "processed_weather_data")
     merged_data_dir = os.path.join(DATA_DIR, "processed")
+
     merge_data(processed_bike_data_dir, processed_weather_data_dir, merged_data_dir)
