@@ -215,12 +215,13 @@ with dagshub_logger() as logger:
             latest_evs = get_latest_model_version_metrics(run_name, 'test_evs')
             current_evs = test_evs
 
-            mlflow.keras.log_model(
-                model=model,
-                artifact_path="keras-model",
-                registered_model_name=run_name
-            )
-            print("New model registered, as it has better EVS.")
+            if latest_evs is None or current_evs > latest_evs:
+                mlflow.keras.log_model(
+                    model=model,
+                    artifact_path="keras-model",
+                    registered_model_name=run_name
+                )
+                print("New model registered, as it has better EVS.")
 
             train_metrics_path = os.path.join(ROOT_DIR, '..', '..', 'reports', model_name, 'train_metrics.txt')
             test_metrics_path = os.path.join(ROOT_DIR, '..', '..', 'reports', model_name, 'test_metrics.txt')

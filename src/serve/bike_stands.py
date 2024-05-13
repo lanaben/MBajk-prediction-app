@@ -38,14 +38,13 @@ def preload_models():
     registered_models = client.search_registered_models()
 
     for model_info in registered_models:
-        for version_info in model_info.latest_versions:
-            model_name = model_info.name
-            model_uri = f"models:/{model_name}/1"
+        model_name = model_info.name
+        model_uri = f"models:/{model_name}/1"
 
-            model = mlflow.pyfunc.load_model(model_uri)
+        model = mlflow.pyfunc.load_model(model_uri)
 
-            models[model_name] = model
-            print(f"Loaded {model_name} into memory.")
+        models[model_name] = model
+        print(f"Loaded {model_name} into memory.")
     print(f"Loaded {len(models)} models.")
 
 

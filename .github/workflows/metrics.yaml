@@ -1,48 +1,48 @@
-#name: Calculate metrics
-#
-#on:
-#  schedule:
-#    - cron: '0 0 * * *'
-#  workflow_dispatch:
-#
-#jobs:
-#  prediction_script:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v2
-#        with:
-#          fetch-depth: 0
-#
-#      - name: Install DVC
-#        run: |
-#          pip install dvc
-#          dvc --version
-#
-#      - name: Install dependencies
-#        run: |
-#          pip install -r requirements.txt
-#
-#      - name: Configure DVC
-#        run: |
-#          dvc remote add -f origin s3://dvc
-#          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
-#          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
-#          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
-#
-#      - name: Pull data with DVC
-#        run: dvc pull
-#
-#      - name: Add and commit prediction reports
-#        run: |
-#          git config --global user.name 'lanaben'
-#          git config --global user.email 'lanaben@users.noreply.github.com'
-#          git fetch origin main
-#          git pull --rebase origin main
-#          python src/serve/accuracy.py
-#          if [ -z "$(git status --porcelain)" ]; then
-#            echo "No changes to commit."
-#          else
-#            git commit -am "Prediction metrics."
-#            git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
-#          fi
+name: Calculate metrics
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  prediction_script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install DVC
+        run: |
+          pip install dvc
+          dvc --version
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Configure DVC
+        run: |
+          dvc remote add -f origin s3://dvc
+          dvc remote modify origin endpointurl https://dagshub.com/lanaben/MBajk-prediction-app.s3
+          dvc remote modify origin --local access_key_id ${{ secrets.ACCES_KEY_ID }}
+          dvc remote modify origin --local secret_access_key ${{ secrets.SECRET_ACCESS_KEY }}
+
+      - name: Pull data with DVC
+        run: dvc pull
+
+      - name: Add and commit prediction reports
+        run: |
+          git config --global user.name 'lanaben'
+          git config --global user.email 'lanaben@users.noreply.github.com'
+          git fetch origin main
+          git pull --rebase origin main
+          python src/serve/accuracy.py
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit."
+          else
+            git commit -am "Prediction metrics."
+            git push https://lanaben:${{ secrets.IIS }}@github.com/lanaben/MBajk-prediction-app.git main
+          fi
